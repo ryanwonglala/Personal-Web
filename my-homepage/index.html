@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的个人主页</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+      animation: pulse 15s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* 视频窗口 - 左上角 */
+    #video-player-container {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      width: 400px;
+      height: 225px;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      z-index: 10;
+      transition: transform 0.3s ease;
+    }
+
+    #video-player-container:hover {
+      transform: scale(1.02);
+    }
+
+    #video-player {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 14px;
+      background: linear-gradient(135deg, #434343 0%, #000000 100%);
+    }
+
+    .video-placeholder svg {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 10px;
+      opacity: 0.4;
+    }
+
+    /* 黑胶唱片播放器容器 */
+    .vinyl-player-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
+    }
+
+    .vinyl-player {
+      position: relative;
+      width: 350px;
+      height: 350px;
+    }
+
+    /* 黑胶唱片 */
+    .vinyl-record {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 30% 30%,
+        #1a1a1a 0%,
+        #000000 30%,
+        #0a0a0a 50%,
+        #000000 100%
+      );
+      box-shadow: 
+        0 0 0 8px #000,
+        0 0 0 10px #1a1a1a,
+        0 20px 50px rgba(0, 0, 0, 0.8),
+        inset 0 0 50px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease;
+    }
+
+    .vinyl-record.playing {
+      animation: spin 3s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* 唱片纹路 */
+    .vinyl-grooves {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      height: 90%;
+      border-radius: 50%;
+      background: repeating-radial-gradient(
+        circle at center,
+        transparent 0px,
+        transparent 2px,
+        rgba(255, 255, 255, 0.03) 2px,
+        rgba(255, 255, 255, 0.03) 4px
+      );
+    }
+
+    /* 唱片中心标签 */
+    .vinyl-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at center,
+        #c41e3a 0%,
+        #8b0000 70%,
+        #5a0000 100%
+      );
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      font-size: 12px;
+      box-shadow: 
+        0 0 20px rgba(196, 30, 58, 0.4),
+        inset 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .vinyl-label-text {
+      text-align: center;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .vinyl-label-title {
+      font-size: 16px;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    .vinyl-label-subtitle {
+      font-size: 10px;
+      opacity: 0.8;
+    }
+
+    /* 唱片中心孔 */
+    .vinyl-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #000;
+      box-shadow: 
+        0 0 0 2px #333,
+        inset 0 2px 5px rgba(0, 0, 0, 0.8);
+    }
+
+    /* 唱臂 */
+    .tonearm {
+      position: absolute;
+      top: 10%;
+      right: -15%;
+      width: 180px;
+      height: 15px;
+      background: linear-gradient(to right, #4a4a4a 0%, #666 50%, #4a4a4a 100%);
+      border-radius: 20px;
+      transform-origin: right center;
+      transform: rotate(-25deg);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+      transition: transform 0.5s ease;
+    }
+
+    .tonearm.playing {
+      transform: rotate(-45deg);
+    }
+
+    .tonearm::before {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid #c0c0c0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+    }
+
+    .tonearm::after {
+      content: '';
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      background: #333;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 播放控制按钮组 */
+    .player-controls {
+      position: absolute;
+      bottom: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .control-button {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .control-button:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+    }
+
+    .control-button:active:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .control-button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .control-button.play-pause {
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    /* 音乐信息显示 */
+    .music-info {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 15px 25px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 100;
+      text-align: center;
+      min-width: 250px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .music-title {
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 300px;
+    }
+
+    .music-artist {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 音乐状态指示器 */
+    .music-indicator {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 25px;
+      font-size: 14px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .music-indicator.show {
+      opacity: 1;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      #video-player-container {
+        width: 280px;
+        height: 158px;
+        top: 20px;
+        left: 20px;
+      }
+
+      .vinyl-player {
+        width: 250px;
+        height: 250px;
+      }
+
+      .vinyl-label {
+        width: 100px;
+        height: 100px;
+      }
+
+      .vinyl-label-title {
+        font-size: 14px;
+      }
+
+      .tonearm {
+        width: 130px;
+        height: 12px;
+      }
+
+      .player-controls {
+        bottom: -70px;
+        gap: 12px;
+      }
+
+      .control-button {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+      }
+
+      .control-button.play-pause {
+        width: 55px;
+        height: 55px;
+        font-size: 22px;
+      }
+
+      .music-info {
+        bottom: 20px;
+        padding: 12px 20px;
+        min-width: 200px;
+      }
+
+      .music-title {
+        font-size: 14px;
+        max-width: 200px;
+      }
+
+      .music-artist {
+        font-size: 12px;
+      }
+
+      .music-indicator {
+        top: 20px;
+        right: 20px;
+        font-size: 12px;
+        padding: 10px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 视频播放器容器 -->
+  <div id="video-player-container">
+    <div class="video-placeholder">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+      <p>视频占位符</p>
+      <p style="font-size: 12px; margin-top: 8px; opacity: 0.5;">请替换为您的视频文件</p>
+    </div>
+  </div>
+
+  <!-- 黑胶唱片播放器 -->
+  <div class="vinyl-player-container">
+    <div class="vinyl-player">
+      <div class="vinyl-record" id="vinyl-record">
+        <div class="vinyl-grooves"></div>
+        <div class="vinyl-label">
+          <div class="vinyl-label-text">
+            <div class="vinyl-label-title">MY MUSIC</div>
+            <div class="vinyl-label-subtitle">Personal Collection</div>
+          </div>
+        </div>
+        <div class="vinyl-center"></div>
+      </div>
+      <div class="tonearm" id="tonearm"></div>
+    </div>
+
+    <!-- 播放控制按钮 -->
+    <div class="player-controls">
+      <button class="control-button" id="prev-btn" aria-label="上一首">
+        <span>⏮️</span>
+      </button>
+      <button class="control-button play-pause" id="play-pause-btn" aria-label="播放/暂停">
+        <span id="play-icon">▶️</span>
+      </button>
+      <button class="control-button" id="next-btn" aria-label="下一首">
+        <span>⏭️</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 背景音乐 -->
+  <audio id="background-music"></audio>
+
+  <!-- 音乐信息显示 -->
+  <div class="music-info" id="music-info">
+    <div class="music-title" id="music-title">未加载音乐</div>
+    <div class="music-artist" id="music-artist">--</div>
+  </div>
+
+  <!-- 音乐状态指示器 -->
+  <div class="music-indicator" id="music-indicator">音乐已暂停</div>
+
+  <script>
+    // ========================================================================
+    // ========================= 🎵 音乐配置区域 START =========================
+    // ========================================================================
+    
+    // 在这里添加您的音乐！文件名可以随意取
+    const MUSIC_PLAYLIST = [
+      {
+        title: '神曼波',
+        artist: '哈基米',
+        src: 'assets/神曼波.mp3'  // 音乐文件路径（例如：'assets/music1.mp3'）
+      },
+      {
+        title: '执迷不悟',
+        artist: '小乐哥',
+        src: 'assets/小乐哥（王唯乐）-执迷不悟.mp3'                        // 第二首歌
+      },
+      {
+        title: '跳楼机',           // 歌曲名称
+        artist: 'LBI利比',            // 艺术家名称
+        src: 'assets/LBI利比-跳楼机.mp3'                      // 第三首歌
+      }
+      // 想要添加更多歌曲？复制上面的格式继续添加！
+    ];
+
+    // ========================================================================
+    // ========================== 🎵 音乐配置区域 END ==========================
+    // ========================================================================
+
+
+    // ========================================================================
+    // ========================= 📹 视频配置区域 START =========================
+    // ========================================================================
+    
+    // 方式一：使用在线视频直链（MP4等格式）
+    const VIDEO_DIRECT_URL = '';  // 例如：'https://example.com/video.mp4'
+    
+    // 方式二：使用视频平台嵌入链接（YouTube、Bilibili等）
+    const VIDEO_EMBED_URL = 'https://player.bilibili.com/player.html?bvid=BV1BfHKzXEC1&autoplay=1&muted=0&danmaku=0';
+  
+    // 选择使用哪种方式（'direct' 或 'embed'）
+    const VIDEO_TYPE = 'embed';  // 改为 'embed' 使用嵌入视频
+
+    // ========================================================================
+    // ========================== 📹 视频配置区域 END ==========================
+    // ========================================================================
+
+
+    // ======================================================================
+    // 以下是程序代码，无需修改（除非您想自定义功能）
+    // ======================================================================
+
+    // 获取DOM元素
+    const videoContainer = document.getElementById('video-player-container');
+    const bgMusic = document.getElementById('background-music');
+    const playPauseBtn = document.getElementById('play-pause-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const playIcon = document.getElementById('play-icon');
+    const musicIndicator = document.getElementById('music-indicator');
+    const musicTitle = document.getElementById('music-title');
+    const musicArtist = document.getElementById('music-artist');
+    const vinylRecord = document.getElementById('vinyl-record');
+    const tonearm = document.getElementById('tonearm');
+
+    let isPlaying = false;
+    let currentTrackIndex = 0;
+
+    // 初始化
+    function init() {
+      // 检查是否有音乐
+      if (MUSIC_PLAYLIST.length > 0 && MUSIC_PLAYLIST[0].src) {
+        loadTrack(currentTrackIndex);
+        updateControlButtons();
+      } else {
+        playIcon.textContent = '🔇';
+        playPauseBtn.disabled = true;
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        musicTitle.textContent = '未加载音乐';
+        musicArtist.textContent = '请在代码中添加音乐文件';
+        showMusicIndicator('未加载音频文件');
+      }
+
+      initVideoPlayer();
+    }
+
+    // 加载音乐
+    function loadTrack(index) {
+      const track = MUSIC_PLAYLIST[index];
+      if (!track || !track.src) return;
+
+      bgMusic.src = track.src;
+      musicTitle.textContent = track.title;
+      musicArtist.textContent = track.artist;
+      
+      const vinylLabel = document.querySelector('.vinyl-label-title');
+      const vinylSubtitle = document.querySelector('.vinyl-label-subtitle');
+      if (vinylLabel) vinylLabel.textContent = track.title.substring(0, 12);
+      if (vinylSubtitle) vinylSubtitle.textContent = track.artist.substring(0, 15);
+      
+      currentTrackIndex = index;
+      updateControlButtons();
+    }
+
+    // 更新按钮状态
+    function updateControlButtons() {
+      if (MUSIC_PLAYLIST.length <= 1) {
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+      } else {
+        prevBtn.disabled = false;
+        nextBtn.disabled = false;
+      }
+    }
+
+    // 上一首
+    function playPrevious() {
+      currentTrackIndex--;
+      if (currentTrackIndex < 0) {
+        currentTrackIndex = MUSIC_PLAYLIST.length - 1;
+      }
+      loadTrack(currentTrackIndex);
+      if (isPlaying) bgMusic.play();
+      showMusicIndicator(`⏮️ ${MUSIC_PLAYLIST[currentTrackIndex].title}`);
+    }
+
+    // 下一首
+    function playNext() {
+      currentTrackIndex++;
+      if (currentTrackIndex >= MUSIC_PLAYLIST.length) {
+        currentTrackIndex = 0;
+      }
+      loadTrack(currentTrackIndex);
+      if (isPlaying) bgMusic.play();
+      showMusicIndicator(`⏭️ ${MUSIC_PLAYLIST[currentTrackIndex].title}`);
+    }
+
+    // 开始播放
+    function startPlaying() {
+      isPlaying = true;
+      playIcon.textContent = '⏸️';
+      vinylRecord.classList.add('playing');
+      tonearm.classList.add('playing');
+      showMusicIndicator(`♪ ${MUSIC_PLAYLIST[currentTrackIndex].title}`);
+    }
+
+    // 停止播放
+    function stopPlaying() {
+      isPlaying = false;
+      playIcon.textContent = '▶️';
+      vinylRecord.classList.remove('playing');
+      tonearm.classList.remove('playing');
+      showMusicIndicator('音乐已暂停');
+    }
+
+    // 初始化视频
+    function initVideoPlayer() {
+      if (VIDEO_TYPE === 'direct' && VIDEO_DIRECT_URL) {
+        const videoElement = document.createElement('video');
+        videoElement.id = 'video-player';
+        videoElement.src = VIDEO_DIRECT_URL;
+        videoElement.autoplay = true;
+        videoElement.muted = true;
+        videoElement.loop = true;
+        videoElement.playsInline = true;
+        videoElement.controls = false;
+        
+        videoContainer.innerHTML = '';
+        videoContainer.appendChild(videoElement);
+        
+        videoContainer.addEventListener('mouseenter', () => {
+          videoElement.controls = true;
+        });
+        videoContainer.addEventListener('mouseleave', () => {
+          videoElement.controls = false;
+        });
+        
+      } else if (VIDEO_TYPE === 'embed' && VIDEO_EMBED_URL) {
+        const iframeElement = document.createElement('iframe');
+        iframeElement.src = VIDEO_EMBED_URL;
+        iframeElement.style.width = '100%';
+        iframeElement.style.height = '100%';
+        iframeElement.style.border = 'none';
+        iframeElement.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframeElement.allowFullscreen = true;
+        
+        videoContainer.innerHTML = '';
+        videoContainer.appendChild(iframeElement);
+      }
+    }
+
+    // 显示提示
+    function showMusicIndicator(message) {
+      musicIndicator.textContent = message;
+      musicIndicator.classList.add('show');
+      setTimeout(() => {
+        musicIndicator.classList.remove('show');
+      }, 2000);
+    }
+
+    // 事件监听
+    playPauseBtn.addEventListener('click', () => {
+      if (!MUSIC_PLAYLIST[currentTrackIndex]?.src) {
+        showMusicIndicator('未加载音频文件');
+        return;
+      }
+
+      if (isPlaying) {
+        bgMusic.pause();
+        stopPlaying();
+      } else {
+        bgMusic.play();
+        startPlaying();
+      }
+    });
+
+    prevBtn.addEventListener('click', playPrevious);
+    nextBtn.addEventListener('click', playNext);
+
+    bgMusic.addEventListener('ended', playNext);
+    bgMusic.addEventListener('play', startPlaying);
+    bgMusic.addEventListener('pause', stopPlaying);
+    bgMusic.addEventListener('error', () => {
+      console.error('音频加载失败:', MUSIC_PLAYLIST[currentTrackIndex]?.src);
+      playIcon.textContent = '❌';
+      showMusicIndicator('音频加载失败');
+    });
+
+    vinylRecord.addEventListener('mouseenter', () => {
+      if (isPlaying) vinylRecord.style.transform = 'scale(1.05)';
+    });
+
+    vinylRecord.addEventListener('mouseleave', () => {
+      vinylRecord.style.transform = 'scale(1)';
+    });
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
