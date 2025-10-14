@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to Ryan Home</title>
+  <title>我的个人主页</title>
   <style>
     * {
       margin: 0;
@@ -92,16 +92,42 @@
         0 4px 15px rgba(0, 0, 0, 0.6);
       transition: all 0.3s ease;
       position: relative;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .mini-vinyl.playing {
-      animation: spin 3s linear infinite;
+      animation: spin 2s linear infinite;
     }
 
     @keyframes spin {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
+    }
+
+    /* 唱片边缘高光标记 - 增强旋转可见性 */
+    .mini-vinyl::before {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(102, 126, 234, 0.8);
+      border-radius: 50%;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 6px rgba(102, 126, 234, 0.8);
+    }
+
+    .mini-vinyl::after {
+      content: '';
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: rgba(245, 87, 108, 0.8);
+      border-radius: 50%;
+      bottom: 8px;
+      right: 12px;
+      box-shadow: 0 0 5px rgba(245, 87, 108, 0.8);
     }
 
     /* 迷你唱片纹路 */
@@ -147,6 +173,19 @@
       background: #000;
       border-radius: 50%;
       position: absolute;
+    }
+
+    /* 唱片上的视觉标记 - 增强旋转可见性 */
+    .mini-center::after {
+      content: '';
+      position: absolute;
+      width: 3px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 2px;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     /* 迷你唱臂 */
@@ -502,25 +541,6 @@
       color: #667eea;
     }
 
-    /* 音符动画 */
-    .music-note {
-      position: absolute;
-      font-size: 12px;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    @keyframes float-up {
-      0% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-50px) scale(1.5);
-        opacity: 0;
-      }
-    }
-
     /* 响应式设计 */
     @media (max-width: 768px) {
       .mini-player {
@@ -528,14 +548,29 @@
         right: 20px;
       }
 
+      .turntable-base {
+        width: 85px;
+        height: 85px;
+      }
+
       .mini-vinyl {
         width: 60px;
         height: 60px;
       }
 
+      .mini-center {
+        width: 18px;
+        height: 18px;
+      }
+
+      .mini-tonearm {
+        width: 30px;
+        height: 3px;
+      }
+
       .player-panel {
         width: 280px;
-        bottom: 80px;
+        bottom: 95px;
       }
 
       .panel-header {
@@ -626,9 +661,10 @@
     // ========================================================================
 
     // 获取DOM元素
+    const turntableBase = document.getElementById('turntableBase');
     const miniVinyl = document.getElementById('miniVinyl');
     const playerPanel = document.getElementById('playerPanel');
-    const playIndicator = document.getElementById('playIndicator');
+    const statusLight = document.getElementById('statusLight');
     const bgMusic = document.getElementById('backgroundMusic');
     const panelTitle = document.getElementById('panelTitle');
     const panelArtist = document.getElementById('panelArtist');
@@ -648,6 +684,9 @@
         loadTrack(0);
         renderPlaylist();
         
+        // 确保初始图标是播放状态
+        panelPlayIcon.className = 'play-icon';
+        
         // 自动播放
         if (AUTO_PLAY) {
           setTimeout(() => {
@@ -657,9 +696,10 @@
           }, 500);
         }
       } else {
-        playIndicator.textContent = '🔇';
+        statusLight.classList.remove('active');
         panelTitle.textContent = '未加载音乐';
         panelArtist.textContent = '请在代码中添加音乐文件';
+        panelPlayIcon.className = 'play-icon';
       }
     }
 
@@ -713,6 +753,11 @@
 
     // 切换播放/暂停
     function togglePlay() {
+      if (!MUSIC_PLAYLIST[currentTrackIndex]?.src) {
+        console.log('未加载音频文件');
+        return;
+      }
+
       if (isPlaying) {
         bgMusic.pause();
       } else {
@@ -744,16 +789,20 @@
     function startPlaying() {
       isPlaying = true;
       miniVinyl.classList.add('playing');
-      playIndicator.textContent = '⏸';
-      panelPlayIcon.textContent = '⏸';
+      statusLight.classList.add('active');
+      
+      // 切换为暂停图标
+      panelPlayIcon.className = 'pause-icon';
     }
 
     // 停止播放
     function stopPlaying() {
       isPlaying = false;
       miniVinyl.classList.remove('playing');
-      playIndicator.textContent = '▶️';
-      panelPlayIcon.textContent = '▶️';
+      statusLight.classList.remove('active');
+      
+      // 切换为播放图标
+      panelPlayIcon.className = 'play-icon';
     }
 
     // 切换面板显示
@@ -766,30 +815,8 @@
       }
     }
 
-    // 创建音符动画
-    function createMusicNote() {
-      if (!isPlaying) return;
-      
-      const note = document.createElement('div');
-      note.className = 'music-note';
-      note.textContent = '♪';
-      note.style.left = (Math.random() * 30 + 20) + 'px';
-      note.style.bottom = '35px';
-      note.style.color = `hsl(${Math.random() * 360}, 70%, 70%)`;
-      
-      miniVinyl.appendChild(note);
-      
-      setTimeout(() => {
-        note.style.animation = 'float-up 1.5s ease-out forwards';
-      }, 10);
-      
-      setTimeout(() => {
-        note.remove();
-      }, 1500);
-    }
-
     // 事件监听
-    miniVinyl.addEventListener('click', togglePanel);
+    turntableBase.addEventListener('click', togglePanel);
     
     panelPlayBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -811,22 +838,15 @@
     bgMusic.addEventListener('ended', playNext);
     bgMusic.addEventListener('error', () => {
       console.error('音频加载失败:', MUSIC_PLAYLIST[currentTrackIndex]?.src);
-      playIndicator.textContent = '❌';
+      statusLight.classList.remove('active');
     });
 
     // 点击面板外部关闭面板
     document.addEventListener('click', (e) => {
-      if (isPanelOpen && !playerPanel.contains(e.target) && !miniVinyl.contains(e.target)) {
+      if (isPanelOpen && !playerPanel.contains(e.target) && !turntableBase.contains(e.target)) {
         togglePanel();
       }
     });
-
-    // 音符动画定时器
-    setInterval(() => {
-      if (isPlaying && Math.random() > 0.7) {
-        createMusicNote();
-      }
-    }, 800);
 
     // 页面加载完成后初始化
     window.addEventListener('DOMContentLoaded', init);
