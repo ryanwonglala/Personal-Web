@@ -19,6 +19,16 @@
       position: relative;
     }
 
+    body.dragging {
+      cursor: grabbing !important;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body.dragging * {
+      cursor: grabbing !important;
+    }
+
     body::before {
       content: '';
       position: absolute;
@@ -344,16 +354,48 @@
 
     .progress-bar-wrapper {
       width: 100%;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      cursor: grab;
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+      padding: 7px 0;
+    }
+
+    .progress-bar-wrapper:active {
+      cursor: grabbing;
+    }
+
+    .progress-bar-track {
+      width: 100%;
       height: 6px;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 3px;
-      cursor: pointer;
       position: relative;
       overflow: visible;
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+
+    .progress-bar-wrapper:hover .progress-bar-track {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .progress-bar-wrapper.dragging .progress-bar-track {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.2);
     }
 
     .progress-bar-wrapper:hover .progress-bar-filled {
       background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .progress-bar-wrapper:hover .progress-bar-thumb {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.2);
     }
 
     .progress-bar-filled {
@@ -361,30 +403,32 @@
       background: linear-gradient(90deg, #667eea 0%, #764ba2 80%);
       border-radius: 3px;
       width: 0%;
-      transition: width 0.1s linear;
       position: relative;
+      pointer-events: none;
+    }
+
+    .progress-bar-filled.dragging {
+      transition: none !important;
     }
 
     .progress-bar-thumb {
       position: absolute;
-      right: -6px;
+      right: -8px;
       top: 50%;
       transform: translateY(-50%);
-      width: 12px;
-      height: 12px;
+      width: 16px;
+      height: 16px;
       background: white;
       border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
       opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .progress-bar-wrapper:hover .progress-bar-thumb {
-      opacity: 1;
+      transition: all 0.2s ease;
+      pointer-events: none;
     }
 
     .progress-bar-filled.active .progress-bar-thumb {
       opacity: 1;
+      transform: translateY(-50%) scale(1.3);
     }
 
     .panel-btn {
@@ -674,8 +718,10 @@
             <span id="totalTime">0:00</span>
           </div>
           <div class="progress-bar-wrapper" id="progressBar">
-            <div class="progress-bar-filled" id="progressFilled">
-              <div class="progress-bar-thumb"></div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-filled" id="progressFilled">
+                <div class="progress-bar-thumb"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -754,6 +800,7 @@
     let currentTrackIndex = 0;
     let isPanelOpen = false;
     let isDragging = false;
+    let dragStartX = 0;
 
     // 初始化
     function init() {
@@ -912,6 +959,7 @@
       
       if (duration && !isNaN(duration)) {
         const percentage = (current / duration) * 100;
+        progressFilled.style.transition = 'width 0.1s linear';
         progressFilled.style.width = `${percentage}%`;
         currentTime.textContent = formatTime(current);
         totalTime.textContent = formatTime(duration);
@@ -919,35 +967,68 @@
     }
 
     // 设置播放进度
-    function setProgress(e) {
+    function setProgress(clientX) {
       const rect = progressBar.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
+      const clickX = clientX - rect.left;
       const width = rect.width;
-      const percentage = clickX / width;
+      const percentage = Math.max(0, Math.min(1, clickX / width));
       const duration = bgMusic.duration;
       
       if (duration && !isNaN(duration)) {
-        bgMusic.currentTime = duration * percentage;
+        // 拖拽时移除过渡效果，立即更新
+        progressFilled.style.transition = 'none';
+        progressFilled.style.width = `${percentage * 100}%`;
+        
+        // 更新时间显示
+        const newTime = duration * percentage;
+        currentTime.textContent = formatTime(newTime);
+        
+        // 实际设置播放时间
+        bgMusic.currentTime = newTime;
       }
     }
 
     // 处理拖拽开始
     function handleDragStart(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
       isDragging = true;
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      dragStartX = clientX;
+      
       progressFilled.classList.add('active');
-      setProgress(e);
+      progressFilled.classList.add('dragging');
+      progressBar.classList.add('dragging');
+      document.body.classList.add('dragging');
+      progressBar.style.cursor = 'grabbing';
+      
+      setProgress(clientX);
     }
 
     // 处理拖拽中
     function handleDragMove(e) {
       if (!isDragging) return;
-      setProgress(e);
+      
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      setProgress(clientX);
     }
 
     // 处理拖拽结束
-    function handleDragEnd() {
+    function handleDragEnd(e) {
+      if (!isDragging) return;
+      
       isDragging = false;
       progressFilled.classList.remove('active');
+      progressFilled.classList.remove('dragging');
+      progressBar.classList.remove('dragging');
+      document.body.classList.remove('dragging');
+      progressBar.style.cursor = 'grab';
+      
+      // 恢复过渡效果
+      setTimeout(() => {
+        progressFilled.style.transition = 'width 0.1s linear';
+      }, 50);
     }
 
     // 事件监听
@@ -985,26 +1066,60 @@
     bgMusic.addEventListener('timeupdate', updateProgress);
     bgMusic.addEventListener('loadedmetadata', updateProgress);
     
-    // 进度条点击
-    progressBar.addEventListener('click', setProgress);
+    // 进度条拖拽 - 鼠标事件
+    progressBar.addEventListener('mousedown', (e) => {
+      // 确保点击的是进度条区域，而不是其他元素
+      handleDragStart(e);
+    });
     
-    // 进度条拖拽
-    progressBar.addEventListener('mousedown', handleDragStart);
-    document.addEventListener('mousemove', handleDragMove);
-    document.addEventListener('mouseup', handleDragEnd);
+    // 在整个文档监听移动和释放，确保拖拽不会丢失
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleDragMove(e);
+      }
+    }, { capture: true, passive: false });
+    
+    document.addEventListener('mouseup', (e) => {
+      if (isDragging) {
+        e.preventDefault();
+        handleDragEnd(e);
+      }
+    }, { capture: true });
+    
+    // 阻止拖拽时的默认选择行为
+    document.addEventListener('selectstart', (e) => {
+      if (isDragging) {
+        e.preventDefault();
+      }
+    });
+    
+    // 防止拖拽时触发其他点击事件
+    document.addEventListener('click', (e) => {
+      if (isDragging) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, { capture: true });
     
     // 触摸设备支持
     progressBar.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      handleDragStart(e.touches[0]);
-    });
+      handleDragStart(e);
+    }, { passive: false });
+    
     document.addEventListener('touchmove', (e) => {
       if (isDragging) {
         e.preventDefault();
-        handleDragMove(e.touches[0]);
+        handleDragMove(e);
+      }
+    }, { passive: false });
+    
+    document.addEventListener('touchend', (e) => {
+      if (isDragging) {
+        handleDragEnd(e);
       }
     });
-    document.addEventListener('touchend', handleDragEnd);
 
     // 点击面板外部关闭面板
     document.addEventListener('click', (e) => {
