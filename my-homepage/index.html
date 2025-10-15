@@ -298,39 +298,45 @@
       opacity: 1;
     }
 
-    /* 太阳 */
+    /* 太阳 - 使用PNG图片 */
     .sun {
       position: absolute;
-      width: 24px;
-      height: 24px;
-      background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
-      border-radius: 50%;
-      box-shadow: 0 0 12px rgba(255, 215, 0, 0.8),
-                  0 0 24px rgba(255, 215, 0, 0.5);
+      width: 28px;
+      height: 28px;
+      background-image: url('assets/sun.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
       transform: translateY(36px);
-      transition: transform var(--transition-speed) ease-in-out;
+      transition: transform var(--transition-speed) ease-in-out,
+                  filter var(--transition-speed) ease-in-out;
     }
 
-    /* 月亮 */
+    /* 月亮 - 使用PNG图片 */
     .moon {
       position: absolute;
-      width: 24px;
-      height: 24px;
-      background: #f5f5f5;
-      border-radius: 50%;
-      box-shadow: inset -7px 0px 0px 0px rgba(128, 128, 128, 0.4),
-                  0 0 12px rgba(255, 255, 255, 0.5);
+      width: 28px;
+      height: 28px;
+      background-image: url('assets/moon.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      filter: drop-shadow(0 0 8px rgba(200, 200, 220, 0.5));
       transform: translateY(0);
-      transition: transform var(--transition-speed) ease-in-out;
+      transition: transform var(--transition-speed) ease-in-out,
+                  filter var(--transition-speed) ease-in-out;
     }
 
     /* 明亮模式 - 太阳升起，月亮降下 */
     body.light-mode .sun {
       transform: translateY(0);
+      filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8));
     }
 
     body.light-mode .moon {
       transform: translateY(-36px);
+      filter: drop-shadow(0 0 8px rgba(200, 200, 220, 0.3));
     }
 
     /* ============ 迷你播放器容器 ============ */
