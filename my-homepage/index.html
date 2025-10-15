@@ -6,6 +6,44 @@
   <title>Welcome to Ryan's Station</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
+    /* ============ CSS 变量定义 - 主题颜色 ============ */
+    :root {
+      /* 黑暗模式颜色 (默认) */
+      --bg-gradient-start: #1a1a2e;
+      --bg-gradient-mid: #16213e;
+      --bg-gradient-end: #0f3460;
+      --sidebar-bg: rgba(15, 23, 42, 0.8);
+      --sidebar-border: rgba(255, 255, 255, 0.1);
+      --text-color: #e4e9f5;
+      --icon-color: #e4e9f5;
+      --hover-color: #ffa117;
+      --section-text-color: rgba(255, 255, 255, 0.1);
+      --active-bg-start: #1a1a2e;
+      --active-bg-mid: #16213e;
+      --active-bg-end: #0f3460;
+      --active-shadow-color: rgba(15, 23, 42, 0.8);
+      --transition-speed: 0.5s;
+      --body-bg-pulse-color: rgba(255, 255, 255, 0.03);
+    }
+
+    body.light-mode {
+      /* 明亮模式颜色 */
+      --bg-gradient-start: #F5F5DC; /* 米白色 */
+      --bg-gradient-mid: #FAFAD2; /* 亮金黄色 */
+      --bg-gradient-end: #FFF8DC; /* 玉米丝色 */
+      --sidebar-bg: rgba(245, 245, 220, 0.85);
+      --sidebar-border: rgba(0, 0, 0, 0.1);
+      --text-color: #3b3b3b;
+      --icon-color: #2c2c2c;
+      --hover-color: #f59e0b;
+      --section-text-color: rgba(0, 0, 0, 0.08);
+      --active-bg-start: #FAEBD7;
+      --active-bg-mid: #FFE4B5;
+      --active-bg-end: #FFDAB9;
+      --active-shadow-color: rgba(245, 245, 220, 0.85);
+      --body-bg-pulse-color: rgba(0, 0, 0, 0.03);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -20,12 +58,13 @@
 
     body {
       font-family: 'Arial', 'Microsoft YaHei', sans-serif;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
       background-attachment: fixed;
       min-height: 100vh;
       overflow-y: auto;
       overflow-x: hidden;
       position: relative;
+      transition: background var(--transition-speed) ease;
     }
 
     body.dragging {
@@ -45,9 +84,9 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: 
-        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+      background:
+        radial-gradient(circle at 20% 50%, var(--body-bg-pulse-color) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, var(--body-bg-pulse-color) 0%, transparent 50%);
       animation: pulse 15s ease-in-out infinite;
     }
 
@@ -61,11 +100,11 @@
       position: fixed;
       width: 84px;
       height: 100%;
-      background: rgba(15, 23, 42, 0.8);
+      background: var(--sidebar-bg);
       backdrop-filter: blur(10px);
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-right: 1px solid var(--sidebar-border);
       z-index: 9999;
-      transition: width 0.5s;
+      transition: width 0.5s, background var(--transition-speed) ease, border-color var(--transition-speed) ease;
       padding-left: 10px;
       overflow: hidden;
     }
@@ -91,6 +130,8 @@
     .sidebar ul {
       position: relative;
       height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .sidebar ul li {
@@ -98,10 +139,15 @@
       padding: 5px;
     }
 
+    .sidebar ul li:not(.theme-switch-li):last-of-type {
+      margin-bottom: 0;
+    }
+
     .sidebar .active {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      background: linear-gradient(135deg, var(--active-bg-start) 0%, var(--active-bg-mid) 50%, var(--active-bg-end) 100%);
       border-top-left-radius: 50px;
       border-bottom-left-radius: 50px;
+      transition: background var(--transition-speed) ease;
     }
 
     .sidebar .active::before {
@@ -112,8 +158,9 @@
       width: 30px;
       height: 30px;
       border-bottom-right-radius: 25px;
-      box-shadow: 5px 5px 0 5px rgba(15, 23, 42, 0.8);
+      box-shadow: 5px 5px 0 5px var(--active-shadow-color);
       background: transparent;
+      transition: box-shadow var(--transition-speed) ease;
     }
 
     .sidebar .active::after {
@@ -124,8 +171,9 @@
       width: 30px;
       height: 30px;
       border-top-right-radius: 25px;
-      box-shadow: 5px -5px 0 5px rgba(15, 23, 42, 0.8);
+      box-shadow: 5px -5px 0 5px var(--active-shadow-color);
       background: transparent;
+      transition: box-shadow var(--transition-speed) ease;
     }
 
     #logo {
@@ -146,8 +194,8 @@
       min-width: 60px;
       padding-left: 10px;
       height: 70px;
-      color: #e4e9f5;
-      transition: 0.5s;
+      color: var(--icon-color);
+      transition: color var(--transition-speed) ease;
     }
 
     .sidebar .icon i {
@@ -161,16 +209,16 @@
       display: flex;
       align-items: center;
       font-size: 20px;
-      color: #e4e9f5;
+      color: var(--text-color);
       padding-left: 15px;
       text-transform: uppercase;
       letter-spacing: 2px;
-      transition: 0.5s;
+      transition: color var(--transition-speed) ease;
     }
 
     .sidebar ul li:hover a .icon,
     .sidebar ul li:hover a .text {
-      color: #ffa117;
+      color: var(--hover-color);
     }
 
     .sidebar .active a .icon::before {
@@ -178,10 +226,10 @@
       position: absolute;
       inset: 5px;
       width: 60px;
-      background: rgba(15, 23, 42, 0.8);
+      background: var(--sidebar-bg);
       border-radius: 50%;
-      transition: 0.5s;
-      border: 7px solid #ffa117;
+      transition: background var(--transition-speed) ease, border-color var(--transition-speed) ease;
+      border: 7px solid var(--hover-color);
       box-sizing: border-box;
     }
 
@@ -194,8 +242,95 @@
       justify-content: center;
       align-items: center;
       font: 900 100px 'Arial', sans-serif;
-      color: rgba(255, 255, 255, 0.1);
+      color: var(--section-text-color);
       padding-left: 84px;
+      transition: color var(--transition-speed) ease;
+    }
+
+    /* ============ 主题切换开关样式 ============ */
+    .theme-switch-li {
+      margin-top: auto;
+      margin-bottom: 20px;
+      width: 100%;
+      padding: 0;
+      background: none !important;
+    }
+
+    .theme-switch-li::before,
+    .theme-switch-li::after {
+      display: none !important;
+    }
+
+    .theme-switch-wrapper {
+      display: flex;
+      align-items: center;
+      padding-left: 15px;
+      min-width: 60px;
+      height: 80px;
+    }
+
+    .theme-switch {
+      position: relative;
+      width: 60px;
+      height: 32px;
+      background: rgba(128, 128, 128, 0.3);
+      border-radius: 16px;
+      cursor: pointer;
+      transition: background var(--transition-speed) ease;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 5px;
+    }
+
+    .theme-switch:hover {
+      background: rgba(128, 128, 128, 0.4);
+    }
+
+    /* Theme 文字默认隐藏，悬停时显示 */
+    .theme-switch-li .text {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .theme-switch:hover + .text {
+      opacity: 1;
+    }
+
+    /* 太阳 */
+    .sun {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.8),
+                  0 0 24px rgba(255, 215, 0, 0.5);
+      transform: translateY(36px);
+      transition: transform var(--transition-speed) ease-in-out;
+    }
+
+    /* 月亮 */
+    .moon {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: #f5f5f5;
+      border-radius: 50%;
+      box-shadow: inset -7px 0px 0px 0px rgba(128, 128, 128, 0.4),
+                  0 0 12px rgba(255, 255, 255, 0.5);
+      transform: translateY(0);
+      transition: transform var(--transition-speed) ease-in-out;
+    }
+
+    /* 明亮模式 - 太阳升起，月亮降下 */
+    body.light-mode .sun {
+      transform: translateY(0);
+    }
+
+    body.light-mode .moon {
+      transform: translateY(-36px);
     }
 
     /* ============ 迷你播放器容器 ============ */
@@ -889,6 +1024,17 @@
           <div class="text">Contact</div>
         </a>
       </li>
+
+      <!-- 主题切换开关 -->
+      <li class="theme-switch-li">
+        <div class="theme-switch-wrapper">
+          <div class="theme-switch">
+            <div class="sun"></div>
+            <div class="moon"></div>
+          </div>
+        </div>
+        <div class="text">Theme</div>
+      </li>
     </ul>
   </div>
 
@@ -1372,6 +1518,41 @@
     }
 
     navItems.forEach((item) => item.addEventListener("click", activeLink));
+
+    // ========================================================================
+    // ========================= 🌓 明暗主题切换逻辑 ===========================
+    // ========================================================================
+
+    const themeSwitch = document.querySelector('.theme-switch');
+    const body = document.body;
+
+    // 页面加载时检查并应用保存的主题
+    function loadSavedTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light-mode') {
+        body.classList.add('light-mode');
+      }
+    }
+
+    // 切换主题
+    function toggleTheme() {
+      body.classList.toggle('light-mode');
+
+      // 保存主题选择到 localStorage
+      if (body.classList.contains('light-mode')) {
+        localStorage.setItem('theme', 'light-mode');
+      } else {
+        localStorage.setItem('theme', 'dark-mode');
+      }
+    }
+
+    // 添加点击事件监听器
+    if (themeSwitch) {
+      themeSwitch.addEventListener('click', toggleTheme);
+    }
+
+    // 页面加载时立即应用保存的主题
+    loadSavedTheme();
   </script>
 </body>
 </html>
