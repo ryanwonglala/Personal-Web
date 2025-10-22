@@ -14,8 +14,8 @@
       --bg-gradient-end: #0f3460;
       --sidebar-bg: rgba(15, 23, 42, 0.8);
       --sidebar-border: rgba(255, 255, 255, 0.1);
-      --text-color: #e4e9f5;
-      --icon-color: #e4e9f5;
+      --text-color: #cbd5e1;
+      --icon-color: #e2e8f0;
       --hover-color: #ffa117;
       --section-text-color: rgba(255, 255, 255, 0.1);
       --active-bg-start: #1a1a2e;
@@ -33,20 +33,24 @@
       --bg-gradient-end: #a76799; /* 玫瑰紫 */
       --sidebar-bg: rgba(255, 255, 255, 0.85);
       --sidebar-border: rgba(255, 255, 255, 0.3);
-      --text-color: #2c3e50;
-      --icon-color: #2c3e50;
-      --hover-color: #f59e0b;
-      --section-text-color: rgba(255, 255, 255, 0.15);
+      --text-color: #475569;
+      --icon-color: #334155;
+      --hover-color: #ea580c;
+      --section-text-color: rgba(0, 0, 0, 0.06);
       --active-bg-start: rgba(255, 255, 255, 0.6);
       --active-bg-mid: rgba(240, 240, 255, 0.6);
       --active-bg-end: rgba(230, 230, 255, 0.6);
       --active-shadow-color: rgba(255, 255, 255, 0.85);
       --body-bg-pulse-color: rgba(255, 255, 255, 0.05);
 
-      /* 白色背景 + 点状网格 */
+      /* 白色背景 + 点状网格 + 橙色径向渐变 */
       background-color: #f8fafc;
-      background-image: radial-gradient(rgba(0, 0, 0, 0.1) 1px, #f8fafc 1px);
-      background-size: 16px 16px;
+      background-image:
+        radial-gradient(125% 125% at 50% 10%, rgba(249, 115, 22, 0.3) 40%, rgba(248, 250, 252, 1) 100%),
+        radial-gradient(rgba(255, 255, 255, 0.2) 1px, #f8fafc 1px);
+      background-size:
+        100% 100%,
+        20px 20px;
       background-attachment: fixed;
     }
 
@@ -1230,19 +1234,8 @@
         title: '最后一哈',
         artist: '哈基米',
         src: 'https://pub-f9f31997afdc468aa605212042ed5ac3.r2.dev/Music/%E3%80%90%E5%AE%8C%E6%95%B4%E7%89%88%E3%80%91%E6%9C%80%E5%90%8E%E4%B8%80%E5%93%88%20-%20001%20-%20%E3%80%90%E5%AE%8C%E6%95%B4%E7%89%88%E3%80%91%E6%9C%80%E5%90%8E%E4%B8%80%E5%93%88.mp3'
-      },  
-      {
-        title: '起哈了',
-        artist: '哈基米',
-        src: 'https://pub-f9f31997afdc468aa605212042ed5ac3.r2.dev/Music/%E3%80%90%E5%AE%8C%E6%95%B4%E7%89%88%E3%80%91%F0%9F%90%B1%E8%B5%B7%E5%93%88%E4%BA%86%F0%9F%90%B1%20%20%20%E2%80%9C%E4%BB%A5%E8%80%84%E4%B9%8B%E5%90%8D%EF%BC%8C%E4%BD%A0%E8%BF%98%E6%84%BF%E6%84%8F%E5%90%97%E2%80%9D%20-%20001%20-%20%E3%80%90%E5%AE%8C%E6%95%B4%E7%89%88%E3%80%91%F0%9F%90%B1%E8%B5%B7%E5%93%88%E4%BA%86%F0%9F%90%B1%20%20%20%E2%80%9C%E4%BB%A5%E8%80%84%E4%B9%8B%E5%90%8D%EF%BC%8C%E4%BD%A0%E8%BF%98%E6%84%BF%E6%84%8F%E5%90%97%E2%80%9D.mp3'
-      },  
-      {
-        title: '把基米拼好给你',
-        artist: '哈基米',
-        src: 'https://pub-f9f31997afdc468aa605212042ed5ac3.r2.dev/Music/%F0%9F%90%B1%E6%8A%8A%E5%9F%BA%E7%B1%B3%E6%8B%BC%E5%A5%BD%E7%BB%99%E4%BD%A0%F0%9F%90%B1%20-%20001%20-%20%F0%9F%90%B1%E6%8A%8A%E5%9F%BA%E7%B1%B3%E6%8B%BC%E5%A5%BD%E7%BB%99%E4%BD%A0%F0%9F%90%B1.mp3'
       }
-
-    ]
+    ];
 
     // 是否自动播放（true = 自动播放，false = 需要手动点击）
     const AUTO_PLAY = true;
