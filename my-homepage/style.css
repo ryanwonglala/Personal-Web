@@ -23,10 +23,10 @@ body.light-mode {
   --bg-gradient-start: #6c92e9; /* 天蓝色 */
   --bg-gradient-mid: #7a6fbe; /* 紫蓝色 */
   --bg-gradient-end: #a76799; /* 玫瑰紫 */
-  --sidebar-bg: rgba(255, 255, 255, 0.95); /* 增加不透明度,提升对比度 */
+  --sidebar-bg: rgba(255, 255, 255, 0.85);
   --sidebar-border: rgba(255, 255, 255, 0.3);
-  --text-color: #1e293b; /* 更深的文字颜色,从 #475569 改为 #1e293b */
-  --icon-color: #0f172a; /* 更深的图标颜色,从 #334155 改为 #0f172a */
+  --text-color: #475569;
+  --icon-color: #334155;
   --hover-color: #ea580c;
   --section-text-color: rgba(0, 0, 0, 0.06);
   --active-bg-start: rgba(255, 255, 255, 0.6);
