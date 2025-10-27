@@ -562,12 +562,26 @@ function loadSavedTheme() {
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme === 'light-mode') {
     body.classList.add('light-mode');
+
+    // 🎨 确保 Shader 背景同步
+    if (window.shaderBackground) {
+      window.shaderBackground.transitionProgress = 1;
+    }
   }
 }
 
 // 切换主题
 function toggleTheme() {
   body.classList.toggle('light-mode');
+
+  // 🎨 触发 Shader 背景过渡
+  if (window.shaderBackground) {
+    if (body.classList.contains('light-mode')) {
+      window.shaderBackground.transitionToLight(1500); // 1.5秒过渡
+    } else {
+      window.shaderBackground.transitionToDark(1500);
+    }
+  }
 
   // 保存主题选择到 localStorage
   if (body.classList.contains('light-mode')) {

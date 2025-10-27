@@ -2011,3 +2011,9 @@ body.light-mode .clouds {
     background-position: 102% 0;
   }
 }
+
+/* 隐藏 Home section 的文字 */
+#home {
+  color: transparent;
+  font-size: 0;
+}
