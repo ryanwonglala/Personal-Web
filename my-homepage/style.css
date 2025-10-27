@@ -262,6 +262,7 @@ section {
 }
 
 /* ============ 主题切换开关样式 ============ */
+/* ============ 主题切换开关样式 (复刻版 WpfGorgeousThemeSwitch) ============ */
 .theme-switch-li {
   margin-top: auto;
   margin-bottom: 20px;
@@ -283,19 +284,28 @@ section {
   height: 80px;
 }
 
+/* Theme 文字默认隐藏，悬停时显示 */
+.theme-switch-li .text {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* 这里我们保留了 .theme-switch 类名，
+  是为了让 script.js 仍能正确找到点击目标 
+*/
+.theme-switch:hover + .text {
+  opacity: 1;
+}
+
+/* 新的开关容器 */
 .theme-switch {
   position: relative;
-  width: 70px;
-  height: 36px;
-  background: linear-gradient(135deg, rgba(30, 30, 60, 0.6), rgba(20, 20, 40, 0.7));
-  border-radius: 18px;
+  width: 70px; /* 宽度 (WPF 100/40, 我们用 70/36) */
+  height: 36px; /* 高度 */
+  border-radius: 18px; /* 圆角 */
   cursor: pointer;
-  transition: all var(--transition-speed) ease;
-  overflow: visible;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 6px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
   margin-left: 5px;
   box-shadow:
     inset 0 2px 8px rgba(0, 0, 0, 0.3),
@@ -303,119 +313,184 @@ section {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.theme-switch:hover {
-  box-shadow:
-    inset 0 2px 8px rgba(0, 0, 0, 0.4),
-    0 6px 16px rgba(0, 0, 0, 0.3);
-}
-
-/* 明亮模式下的开关背景 */
-body.light-mode .theme-switch {
-  background: linear-gradient(135deg, rgba(255, 200, 100, 0.5), rgba(255, 220, 150, 0.6));
-  box-shadow:
-    inset 0 2px 8px rgba(255, 165, 0, 0.2),
-    0 4px 12px rgba(255, 165, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* 玻璃滑块 */
-.theme-switch::before {
-  content: '';
+/* 开关轨道 (背景) */
+.gorgeous-switch-track {
   position: absolute;
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 240, 255, 0.8));
-  border-radius: 50%;
-  left: 4px;
-  top: 4px;
-  transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    inset 0 1px 3px rgba(255, 255, 255, 0.8),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  background: #171E33; /* 默认深色背景 */
+  transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 玻璃高光效果 */
-.theme-switch::after {
-  content: '';
+/* 开关滑块 (太阳/月亮) */
+.gorgeous-switch-thumb {
   position: absolute;
-  width: 22px;
-  height: 12px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), transparent);
+  width: 30px; /* 滑块大小 */
+  height: 30px; /* 滑块大小 */
+  top: 3px;
+  left: 3px;
   border-radius: 50%;
-  left: 7px;
-  top: 6px;
-  transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
+  background: #C4C9D4; /* 默认是月亮 */
+  transform: translateX(0px);
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* 弹性动画 */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* 明亮模式 - 滑块移动到右侧 */
-body.light-mode .theme-switch::before {
-  left: 38px;
-  background: linear-gradient(135deg, rgba(255, 245, 200, 1), rgba(255, 235, 180, 0.95));
-  box-shadow:
-    0 4px 12px rgba(255, 165, 0, 0.4),
-    inset 0 1px 3px rgba(255, 255, 255, 0.9),
-    inset 0 -2px 4px rgba(255, 200, 100, 0.2);
-}
-
-body.light-mode .theme-switch::after {
-  left: 41px;
-}
-
-/* Theme 文字默认隐藏，悬停时显示 */
-.theme-switch-li .text {
+/* 太阳 (默认隐藏) */
+.thumb-sun {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #F3C62B;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transform: scale(0.8);
+  transition: all 0.5s ease;
 }
 
-.theme-switch:hover + .text {
+/* 月亮 (默认显示) */
+.thumb-moon {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #C4C9D4;
   opacity: 1;
+  transform: scale(1);
+  transition: all 0.5s ease;
 }
 
-/* 太阳图标 */
-.sun {
+/* 月亮上的坑 */
+.crater {
+  position: absolute;
+  background: #9A9FB2;
+  border-radius: 50%;
+  opacity: 0.6;
+  width: var(--crater-size, 6px);
+  height: var(--crater-size, 6px);
+  top: var(--crater-top, 5px);
+  left: var(--crater-left, 15px);
+}
+
+/* 星星 (默认显示) */
+.stars {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.5s ease;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  width: var(--star-size, 2px);
+  height: var(--star-size, 2px);
+  top: var(--star-top, 10px);
+  left: var(--star-left, 25px);
+  animation: twinkle 2s infinite ease-in-out;
+  animation-delay: var(--star-delay, 0s);
+}
+
+/* 星星闪烁动画 */
+@keyframes twinkle {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.5); opacity: 0.5; }
+}
+
+/* 云朵 (默认隐藏) */
+.clouds {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.6s ease;
+}
+
+.cloud {
   position: absolute;
   width: 20px;
-  height: 20px;
-  background-image: url('assets/sun.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.4));
-  right: 8px;
-  opacity: 0.5;
-  transition: all var(--transition-speed) ease-in-out;
-  z-index: 1;
+  height: 8px;
+  background: white;
+  border-radius: 10px;
+  top: var(--cloud-top, 10px);
+  left: var(--cloud-left, 10px);
+  scale: var(--cloud-scale, 1);
+  animation: drift 5s infinite linear;
+  animation-delay: var(--cloud-delay, 0s);
 }
-
-/* 月亮图标 */
-.moon {
+.cloud::before {
+  content: '';
   position: absolute;
-  width: 20px;
-  height: 20px;
-  background-image: url('assets/moon.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  filter: drop-shadow(0 0 6px rgba(200, 200, 255, 0.6));
-  left: 8px;
-  opacity: 1;
-  transition: all var(--transition-speed) ease-in-out;
-  z-index: 1;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  top: -6px;
+  left: 3px;
+}
+.cloud::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  top: -4px;
+  right: 2px;
 }
 
-/* 明亮模式 - 太阳高亮，月亮暗淡 */
-body.light-mode .sun {
-  opacity: 1;
-  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+/* 云朵漂浮动画 */
+@keyframes drift {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+  100% { transform: translateX(0); }
 }
 
-body.light-mode .moon {
-  opacity: 0.4;
-  filter: drop-shadow(0 0 4px rgba(200, 200, 255, 0.3));
+
+/* ====== 明亮模式 (light-mode) 激活时的样式 ====== */
+
+/* 轨道背景变蓝 */
+body.light-mode .gorgeous-switch-track {
+  background: #4685C0;
+}
+
+/* 滑块右移 */
+body.light-mode .gorgeous-switch-thumb {
+  transform: translateX(34px); /* 70px (宽) - 30px (滑块) - 3px (左) - 3px (右) */
+}
+
+/* 太阳显示 */
+body.light-mode .thumb-sun {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 月亮隐藏 */
+body.light-mode .thumb-moon {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+/* 星星隐藏 */
+body.light-mode .stars {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* 云朵显示 */
+body.light-mode .clouds {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* (移除旧的 .sun 和 .moon 样式) */
+.sun, .moon {
+  display: none;
 }
 
 /* ============ 迷你播放器容器 ============ */
