@@ -2,11 +2,11 @@
 // ========================= 🎬 加载动画控制 START =========================
 // ========================================================================
 
-// 页面加载时显示加载动画，5秒后淡出
+// 页面加载时显示加载动画，3秒后淡出
 window.addEventListener('DOMContentLoaded', () => {
   const loadingOverlay = document.getElementById('loading-overlay');
 
-  // 5秒后开始淡出
+  // 3秒后开始淡出
   setTimeout(() => {
     loadingOverlay.classList.add('fade-out');
 
@@ -14,7 +14,7 @@ window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       loadingOverlay.style.display = 'none';
     }, 800); // 0.8秒淡出动画时长
-  }, 5000); // 5秒加载时长
+  }, 3000); // 3秒加载时长
 });
 
 // ========================================================================
@@ -99,15 +99,6 @@ async function init() {
 
     // 确保初始图标是播放状态
     panelPlayIcon.className = 'play-icon';
-
-    // 自动播放
-    if (AUTO_PLAY) {
-      setTimeout(() => {
-        bgMusic.play().catch(err => {
-          console.log('自动播放被浏览器阻止，需要用户交互');
-        });
-      }, 500);
-    }
   } else {
     statusLight.classList.remove('active');
     panelTitle.textContent = '未加载音乐';
